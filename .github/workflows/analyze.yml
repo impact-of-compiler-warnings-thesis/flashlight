@@ -27,12 +27,12 @@ jobs:
           cd && mkdir .vcpkg
           cd $GITHUB_WORKSPACE
           git clone https://github.com/microsoft/vcpkg
-          ./vcpkg/bootstrap-vcpkg.sh
+          ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
           ./vcpkg/vcpkg integrate install
       - name: Install dependencies
         run: |
           export VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg
-          sudo apt install ninja-build intel-oneapi-mkl intel-mkl nvidia-cuda-dev
+          sudo apt install ninja-build intel-oneapi-mkl nvidia-cuda-dev
       - name: Install Vcpkg dependencies
         run: |
           ./vcpkg/vcpkg install flashlight-cpu \
