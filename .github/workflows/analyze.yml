@@ -20,7 +20,7 @@ jobs:
       - name: Install Vcpkg
         run: |
           git clone https://github.com/microsoft/vcpkg
-          ./vcpkg/boostrap-vcpkg.sh
+          ./vcpkg/bootstrap-vcpkg.sh
           ./vcpkg/vcpkg integrate install
       - name: Install dependencies
         run: |
