@@ -17,6 +17,11 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install sonar-scanner and build-wrapper
         uses: SonarSource/sonarcloud-github-c-cpp@v1
+      - name: Install Intel MKL
+        run: |
+          wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+          sudo apt update
       - name: Install Vcpkg
         run: |
           cd && mkdir .vcpkg
@@ -27,8 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           export VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg
-          sudo apt update
-          sudo apt install ninja-build intel-mkl nvidia-cuda-dev
+          sudo apt install ninja-build intel-oneapi-mkl intel-mkl nvidia-cuda-dev
       - name: Install Vcpkg dependencies
         run: |
           ./vcpkg/vcpkg install flashlight-cpu \
