@@ -1,0 +1,61 @@
+name: SonarCloud
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  build:
+    name: Build and analyze
+    runs-on: ubuntu-latest
+    env:
+      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Install sonar-scanner and build-wrapper
+        uses: SonarSource/sonarcloud-github-c-cpp@v1
+      - name: Init submodules
+        run: git submodule update --init --recursive
+      - name: Install Vcpkg
+        run: |
+          ./vcpkg/boostrap-vcpkg.sh
+          ./vcpkg/vcpkg integrate install
+      - name: Install dependencies
+        run: |
+          export VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg
+          sudo apt update
+          sudo apt install ninja-build intel-mkl nvidia-cuda-dev
+      - name: Install Vcpkg dependencies
+        run: |
+          ./vcpkg/vcpkg install flashlight-cpu \
+                                intel-mkl \
+                                fftw3 \
+                                kenlm \
+                                arrayfire[cpu] \
+                                gloo[mpi] \
+                                openmpi \
+                                onednn \
+                                cereal \
+                                stb \
+                                gflags \
+                                glog \
+                                libsndfile \
+                                gtest
+      - name: Generate build files
+        run: |
+          export VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg
+          mkdir build && cd build
+          cmake .. -GNinja -DCMAKE_BUILD_TYPE=Debug \ 
+                           -DFL_BUILD_ARRAYFIRE=ON \
+                           -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+      - name: Run build-wrapper
+        run: build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} ninja -C build
+      - name: Run sonar-scanner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
