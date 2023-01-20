@@ -41,7 +41,6 @@ jobs:
           VCPKG_ROOT: $GITHUB_WORKSPACE/vcpkg
         run: |
           ./vcpkg/vcpkg install flashlight-cpu \
-                                intel-mkl \
                                 fftw3 \
                                 kenlm \
                                 arrayfire[cpu] \
