@@ -19,13 +19,16 @@ jobs:
         uses: SonarSource/sonarcloud-github-c-cpp@v1
       - name: Install Intel MKL
         run: |
-          wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
-            | gpg --dearmor \
-            | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
-          echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" \
-            | sudo tee /etc/apt/sources.list.d/oneAPI.list
+          # wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
+          #   | gpg --dearmor \
+          #   | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+          # echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" \
+          #   | sudo tee /etc/apt/sources.list.d/oneAPI.list
           sudo apt update
-          sudo apt install intel-mkl intel-oneapi-mkl
+          sudo apt install intel-mkl libmkl-dev
+      - name: Install system dependencies
+        run: |
+          sudo apt install ninja-build nvidia-cuda-dev
       - name: Install Vcpkg
         run: |
           cd && mkdir .vcpkg
@@ -33,9 +36,6 @@ jobs:
           git clone https://github.com/microsoft/vcpkg
           ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
           ./vcpkg/vcpkg integrate install
-      - name: Install dependencies
-        run: |
-          sudo apt install ninja-build nvidia-cuda-dev
       - name: Install Vcpkg dependencies
         env:
           VCPKG_ROOT: $GITHUB_WORKSPACE/vcpkg
