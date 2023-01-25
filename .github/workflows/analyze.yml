@@ -25,7 +25,7 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" \
             | sudo tee /etc/apt/sources.list.d/oneAPI.list
           sudo apt update
-          sudo apt install intel-oneapi-mkl
+          sudo apt install intel-mkl intel-oneapi-mkl
       - name: Install Vcpkg
         run: |
           cd && mkdir .vcpkg
@@ -39,6 +39,7 @@ jobs:
       - name: Install Vcpkg dependencies
         env:
           VCPKG_ROOT: $GITHUB_WORKSPACE/vcpkg
+          MKLROOT: /usr/lib/x86_64-linux-gnu
         run: |
           ./vcpkg/vcpkg install flashlight-cpu \
                                 fftw3 \
