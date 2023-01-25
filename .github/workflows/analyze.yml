@@ -25,7 +25,7 @@ jobs:
           # echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" \
           #   | sudo tee /etc/apt/sources.list.d/oneAPI.list
           sudo apt update
-          sudo apt install intel-mkl libmkl-dev
+          sudo apt install libmkl*
       - name: Install system dependencies
         run: |
           sudo apt install ninja-build nvidia-cuda-dev
