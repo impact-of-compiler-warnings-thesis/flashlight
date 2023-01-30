@@ -21,19 +21,22 @@ jobs:
         run: |
           sudo apt install ninja-build \
                            nvidia-cuda-dev \
+                           nvidia-cuda-toolkit \
                            libmkl-full-dev \
                            libgtest-dev \
                            libgmock-dev \
                            libarrayfire-dev \
                            libcereal-dev \
-                           libdnnl-dev
+                           libdnnl-dev \
+                           libopenmpi-dev \
+                           libopenmpi3
       - name: Generate build files
         run: |
           mkdir build && cd build
           cmake .. -GNinja \
                    -DCMAKE_BUILD_TYPE=Debug \
                    -DFL_USE_ONEDNN=OFF \
-                   -DFL_BUILD_STANDALONE=ON \
+                   -DFL_BUILD_STANDALONE=OFF \
                    -DFL_BUILD_TESTS=ON \
                    -DFL_BUILD_EXAMPLES=ON
       - name: Run build-wrapper
