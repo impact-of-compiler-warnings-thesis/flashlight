@@ -19,9 +19,10 @@ jobs:
         uses: SonarSource/sonarcloud-github-c-cpp@v1
       - name: Install system dependencies
         run: |
-          sudo apt install ninja-build \
+          sudo apt install --install-suggests \
+                           ninja-build \
                            nvidia-cuda-dev \
-                           libmkl-full-dev
+                           libmkl-full-dev \
                            libgtest-dev \
                            libgmock-dev \
                            libarrayfire-dev \
