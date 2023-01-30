@@ -17,51 +17,25 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install sonar-scanner and build-wrapper
         uses: SonarSource/sonarcloud-github-c-cpp@v1
-      - name: Install Intel MKL
-        run: |
-          # wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
-          #   | gpg --dearmor \
-          #   | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
-          # echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" \
-          #   | sudo tee /etc/apt/sources.list.d/oneAPI.list
-          sudo apt update
-          sudo apt install libmkl*
       - name: Install system dependencies
         run: |
-          sudo apt install ninja-build nvidia-cuda-dev
-      - name: Install Vcpkg
-        run: |
-          cd && mkdir .vcpkg
-          cd $GITHUB_WORKSPACE
-          git clone https://github.com/microsoft/vcpkg
-          ./vcpkg/bootstrap-vcpkg.sh -disableMetrics
-          ./vcpkg/vcpkg integrate install
-      - name: Install Vcpkg dependencies
-        env:
-          VCPKG_ROOT: $GITHUB_WORKSPACE/vcpkg
-          MKLROOT: /usr/lib/x86_64-linux-gnu
-        run: |
-          ./vcpkg/vcpkg install flashlight-cpu \
-                                fftw3 \
-                                kenlm \
-                                arrayfire[cpu] \
-                                gloo[mpi] \
-                                openmpi \
-                                onednn \
-                                cereal \
-                                stb \
-                                gflags \
-                                glog \
-                                libsndfile \
-                                gtest
+          sudo apt install ninja-build \
+                           nvidia-cuda-dev \
+                           libmkl-full-dev
+                           libgtest-dev \
+                           libgmock-dev \
+                           libarrayfire-dev \
+                           libcereal-dev \
+                           libdnnl-dev
       - name: Generate build files
-        env:
-          VCPKG_ROOT: $GITHUB_WORKSPACE/vcpkg
         run: |
           mkdir build && cd build
-          cmake .. -GNinja -DCMAKE_BUILD_TYPE=Debug \ 
-                           -DFL_BUILD_ARRAYFIRE=ON \
-                           -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+          cmake .. -GNinja \
+                   -DCMAKE_BUILD_TYPE=Debug \
+                   -DFL_USE_ONEDNN=OFF \
+                   -DFL_BUILD_STANDALONE=ON \
+                   -DFL_BUILD_TESTS=ON \
+                   -DFL_BUILD_EXAMPLES=ON
       - name: Run build-wrapper
         run: build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} ninja -C build
       - name: Run sonar-scanner
