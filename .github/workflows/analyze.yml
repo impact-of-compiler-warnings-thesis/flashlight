@@ -35,8 +35,9 @@ jobs:
           mkdir build && cd build
           cmake .. -GNinja \
                    -DCMAKE_BUILD_TYPE=Debug \
+                   -DFL_BUILD_STANDALONE=ON \
                    -DFL_USE_ONEDNN=OFF \
-                   -DFL_BUILD_STANDALONE=OFF \
+                   -DFL_USE_ARRAYFIRE=OFF \
                    -DFL_BUILD_TESTS=ON \
                    -DFL_BUILD_EXAMPLES=ON
       - name: Run build-wrapper
